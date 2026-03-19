@@ -209,10 +209,16 @@ generate_z1server_config() {
         mkdir -p /etc/z1server >/dev/null 2>&1
         cat > /etc/z1server/config.json <<EOF
 {
-    "Log": {
-        "Level": "warning",
-        "Output": "",
-        "Access": "none"
+    "Log": { "Level": "error" },
+    "TargetCountry": "cn",
+    "DnsServers": ["223.5.5.5", "1.1.1.1"],
+    "EnableSniffing": true,
+    "DeviceMinSpeed": 200,
+    "Warp": {
+        "Enable": true,
+        "PrivateKey": "auto-generated",
+        "Address": "172.16.0.2/32",
+        "Reserved": [0, 0, 0]
     },
     "Nodes": [
         {
