@@ -257,7 +257,12 @@ install_z1server() {
         fi
         echo -e "${green}Phát hiện phiên bản mới nhất: ${last_version}, bắt đầu cài đặt...${plain}"
         url="https://github.com/z1-benc/Z1-Server/releases/download/${last_version}/z1server-linux-${arch}.zip"
-        curl -fSL "$url" | pv -s 30M -W -N "Đang tải" > /usr/local/z1server/z1server-linux.zip
+        if command -v pv &>/dev/null; then
+            curl -fSL "$url" | pv -s 30M -W -N "Đang tải" > /usr/local/z1server/z1server-linux.zip
+        else
+            echo "  Đang tải..."
+            curl -fSL -o /usr/local/z1server/z1server-linux.zip "$url"
+        fi
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Tải Z1Server thất bại, hãy đảm bảo server có thể tải file từ GitHub${plain}"
             rm -f /usr/local/z1server/z1server-linux.zip
@@ -266,7 +271,12 @@ install_z1server() {
     else
     last_version=$version_param
         url="https://github.com/z1-benc/Z1-Server/releases/download/${last_version}/z1server-linux-${arch}.zip"
-        curl -fSL "$url" | pv -s 30M -W -N "Đang tải" > /usr/local/z1server/z1server-linux.zip
+        if command -v pv &>/dev/null; then
+            curl -fSL "$url" | pv -s 30M -W -N "Đang tải" > /usr/local/z1server/z1server-linux.zip
+        else
+            echo "  Đang tải..."
+            curl -fSL -o /usr/local/z1server/z1server-linux.zip "$url"
+        fi
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Tải Z1Server $1 thất bại, hãy đảm bảo phiên bản này tồn tại${plain}"
             rm -f /usr/local/z1server/z1server-linux.zip
@@ -276,6 +286,8 @@ install_z1server() {
 
     unzip z1server-linux.zip
     rm z1server-linux.zip -f
+    # Fallback rename nếu binary vẫn tên v2node
+    [[ -f v2node ]] && [[ ! -f z1server ]] && mv v2node z1server
     chmod +x z1server
     mkdir /etc/z1server/ -p
     cp geoip.dat /etc/z1server/
